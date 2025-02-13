@@ -40,6 +40,7 @@ function Chat() {
 
     client.on("message", async (channel, tags, message) => {
       if (message.startsWith("!block")) {
+        if (!tags.mod) return;
         var args = message.split(" ");
         var username = args[1].toLowerCase();
         if (username.startsWith("@")) username = username.slice(1);
@@ -51,6 +52,7 @@ function Chat() {
       }
 
       if (message.startsWith("!unblock")) {
+        if (!tags.mod) return;
         var args = message.split(" ");
         var username = args[1].toLowerCase();
         if (username.startsWith("@")) username = username.slice(1);
