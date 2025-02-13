@@ -5,31 +5,29 @@ export function setSevenTvEmotes(emotes) {
 }
 
 export default function messageParser(message) {
-  var fragments = message.split(" ");
-  var parsedFragments = [];
+  // Escape HTML function
+  const escapeHTML = (str) =>
+    str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-  const escapeHTML = (str) => str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  // Tokenize message while preserving delimiters
+  const tokens = message.match(/(@\w+|\S+)/g) || [];
 
+  return tokens
+    .map((token) => {
+      const escapedToken = escapeHTML(token);
 
-
-  for (var FRAGMENT of fragments) {
-    var fragment = escapeHTML(FRAGMENT)
-    if (fragment.startsWith("@")) {
-      parsedFragments.push(`<b>${FRAGMENT}</b>`);
-      continue;
-    }
-
-    if (sevenTvEmotes.length > 0) {
-      var emote = sevenTvEmotes.find((emote) => emote.name === fragment);
-      if (emote) {
-        console.log("Found emote: " + emote.name);
-        parsedFragments.push(`<img class="h-6 mx-1" src="https:${emote.data.host.url}/4x.webp" alt="${emote.name}" />`);
-        continue;
+      // Check for mentions
+      if (token.startsWith("@")) {
+        return `<b class="mx-1">${escapedToken}</b>`;
       }
-    }
 
-    parsedFragments.push(`${fragment}`);
-  }
+      // Check for emotes
+      const emote = sevenTvEmotes.find((e) => e.name === token);
+      if (emote) {
+        return `<img class="h-6 mx-1" src="https:${emote.data.host.url}/4x.webp" alt="${emote.name}" />`;
+      }
 
-  return parsedFragments.join(" ");
+      return escapedToken;
+    })
+    .join(" ");
 }

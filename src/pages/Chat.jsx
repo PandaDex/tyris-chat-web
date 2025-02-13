@@ -30,6 +30,10 @@ function Chat() {
       if (error === null) setSevenTvEmotes(data);
     });
 
+    client.on("messagedeleted", (channel, tags, message) => {
+      setMessages([]);
+    });
+
     client.on("message", async (channel, tags, message) => {
       var badges = await badgeParser(tags);
 
