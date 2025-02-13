@@ -51,7 +51,7 @@ function Chat() {
               },
             },
           ];
-          return newMessages.slice(-50);
+          return newMessages.slice(-15);
         });
         return;
       }
@@ -69,7 +69,7 @@ function Chat() {
               },
             },
           ];
-          return newMessages.slice(-50);
+          return newMessages.slice(-15);
         });
       } else {
         await fetch(`${import.meta.env.VITE_API}/user/${tags["user-id"]}`, {
@@ -94,7 +94,7 @@ function Chat() {
                   },
                 },
               ];
-              return newMessages.slice(-50);
+              return newMessages.slice(-15);
             });
           });
       }

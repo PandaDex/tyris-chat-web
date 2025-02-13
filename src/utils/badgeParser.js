@@ -17,6 +17,8 @@ export default async function badgeParser(tags) {
     }
   }
 
+  if (!tags.badges) return [];
+
   Object.keys(tags.badges).forEach((key) => {
     const foundBadge = globalBadges.find((badge) => badge.id === key);
     if (foundBadge) {
