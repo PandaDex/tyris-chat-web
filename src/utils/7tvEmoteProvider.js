@@ -1,5 +1,5 @@
 var sevenTvEndpoint = "https://7tv.io/v3";
-var streamerId = "145711861";
+var streamerId = import.meta.env.VITE_STREAMER_ID;
 
 const fetchEmotesByTwitchId = async (id) => {
 	try {

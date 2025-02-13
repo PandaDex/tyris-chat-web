@@ -38,6 +38,10 @@ function Chat() {
       setMessages([]);
     });
 
+    client.on("clearchat", (channel, tags, message) => {
+      setMessages([]);
+    });
+
     client.on("message", async (channel, tags, message) => {
       if (message.startsWith("!block")) {
         if (!tags.mod) return;
@@ -48,6 +52,19 @@ function Chat() {
         temp.push(username);
         localStorage.setItem("blockedUsers", JSON.stringify(temp));
         setBlockedUsers(temp);
+        return;
+      }
+
+      if (message.startsWith("!clear")) {
+        if (!tags.mod) return;
+        setMessages([]);
+        return;
+      }
+
+      if (message.startsWith("!emote")) {
+        if (!tags.mod) return;
+        var [data, error] = await fetchEmotesByTwitchId(streamerId);
+        if (error === null) setSevenTvEmotes(data);
         return;
       }
 
@@ -142,7 +159,6 @@ function Chat() {
       ref={chatRef}
       className="p-4 flex flex-col gap-4 w-full h-full overflow-scroll overflow-x-hidden"
     >
-      <title>{channelName} - chat</title>
       {messages.map((message, index) => (
         <ChatMessage
           key={index}
