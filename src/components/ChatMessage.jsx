@@ -27,7 +27,7 @@ function ChatMessage({
               {chatterData.badges?.map((badge, index) => (
                 <img
                   key={index}
-                  className="h-[16px] w-[16px] select-none"
+                  className="h-[16px] w-[16px] select-none rounded-sm"
                   draggable="false"
                   src={badge.url}
                   alt="badge"
@@ -40,7 +40,7 @@ function ChatMessage({
           dangerouslySetInnerHTML={{
             __html: chatterData.message,
           }}
-          className="flex flex-wrap break-all whitespace-pre-wrap items-center chuj-jebać-firefox  text-sm w-fit max-w-[300px] py-1 mt-1 px-2 bg-black rounded-lg text-white"
+          className="flex flex-wrap break-all whitespace-pre-wrap items-center chuj-jebać-firefox  text-sm w-fit max-w-[300px] py-1 mt-1 px-1.5 bg-black rounded-lg text-white"
         />
       </div>
     </span>

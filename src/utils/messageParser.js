@@ -1,7 +1,7 @@
 var sevenTvEmotes = [];
 
 export function setSevenTvEmotes(emotes) {
-  sevenTvEmotes = emotes;
+  sevenTvEmotes.splice(0, sevenTvEmotes.length, ...emotes);
 }
 
 export default function messageParser(message, tags) {
@@ -9,7 +9,6 @@ export default function messageParser(message, tags) {
   const escapeHTML = (str) =>
     str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-  // Parse Twitch emotes from tags["emotes-raw"]
   const twitchEmotes = {};
   if (tags["emotes-raw"]) {
     tags["emotes-raw"].split("/").forEach((emoteData) => {
@@ -21,33 +20,36 @@ export default function messageParser(message, tags) {
     });
   }
 
-  // Tokenize message while preserving delimiters
-  const tokens = message.match(/(@\w+|\S+)/g) || [];
-  let result = "";
-  let i = 0;
+  const messageClear = escapeHTML(message).split(" ");
+  const completeMessage = [];
 
-  while (i < message.length) {
-    if (twitchEmotes[i]) {
-      const { id, end } = twitchEmotes[i];
-      const emoteHtml = `<img class="h-6 mx-1" src="https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/dark/3.0" alt="emote" />`;
-      result += emoteHtml;
-      i = end + 1; // Move past the emote
-    } else {
-      let tokenFound = false;
-      for (const emote of sevenTvEmotes) {
-        if (message.startsWith(emote.name, i)) {
-          result += `<img class="h-6 mx-1" src="https:${emote.data.host.url}/4x.webp" alt="${emote.name}" />`;
-          i += emote.name.length;
-          tokenFound = true;
-          break;
-        }
-      }
-      if (!tokenFound) {
-        result += escapeHTML(message[i]);
-        i++;
-      }
+  for (const FRAGMENT of messageClear) {
+    if (FRAGMENT.startsWith("@")) {
+      completeMessage.push(`<b>${FRAGMENT}</b>`);
+      continue;
     }
+
+    const emote = sevenTvEmotes.find((e) => e.name === FRAGMENT);
+    if (emote) {
+      completeMessage.push(
+        `<img class="h-6 mx-1" src="https://${emote.data.host.url}/4x.webp" alt="${emote.name}" />`
+      );
+      continue;
+    }
+
+    let foundTwitchEmote = false;
+    Object.keys(twitchEmotes).forEach((start) => {
+      const emote = twitchEmotes[start];
+      if (message.substring(start, emote.end + 1) === FRAGMENT) {
+        completeMessage.push(
+          `<img class="h-6 mx-1" src="https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0" alt="${emote.id}" />`
+        );
+        foundTwitchEmote = true;
+      }
+    });
+    if (foundTwitchEmote) continue;
+    completeMessage.push(FRAGMENT);
   }
 
-  return result;
+  return completeMessage.join(" ");
 }
