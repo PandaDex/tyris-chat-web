@@ -23,7 +23,7 @@ function ChatMessage({
             {chatterData.username}
           </h1>
           <div className="flex flex-row ml-2 items-center bg-black chuj-jebać-firefox px-1 py-0.5 rounded-md gap-1">
-            {chatterData.badges !== undefined &&
+            {chatterData.badges !== null &&
               chatterData.badges?.map((badge, index) => (
                 <img
                   key={index}
