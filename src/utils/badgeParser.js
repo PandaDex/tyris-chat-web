@@ -11,7 +11,6 @@ export default async function badgeParser(tags) {
       });
       const data = await response.json();
       if (response.ok) globalBadges = data.badges;
-      console.log(data);
     } catch (error) {
       console.error("Failed to fetch global badges:", error);
     }

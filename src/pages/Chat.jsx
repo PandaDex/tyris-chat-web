@@ -72,7 +72,7 @@ function Chat() {
           const newMessages = [
             ...prev,
             {
-              message: messageParser(message),
+              message: messageParser(message, tags),
               tags: {
                 username: tags.username,
                 avatar: "https://i.imgur.com/4X2vyND.png",
@@ -90,7 +90,7 @@ function Chat() {
           const newMessages = [
             ...prev,
             {
-              message: messageParser(message),
+              message: messageParser(message, tags),
               tags: {
                 username: tags.username,
                 avatar: cachedAvatars.find((x) => x.id === tags["user-id"]).url,
@@ -115,7 +115,7 @@ function Chat() {
               const newMessages = [
                 ...prev,
                 {
-                  message: messageParser(message),
+                  message: messageParser(message, tags),
                   tags: {
                     username: tags.username,
                     avatar: data.avatar,
