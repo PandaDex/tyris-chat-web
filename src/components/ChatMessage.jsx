@@ -7,7 +7,6 @@ function ChatMessage({
     usernameColor: "#fff",
   },
 }) {
-  console.log(chatterData.badges);
   return (
     <span className="flex flex-row">
       <img
@@ -35,9 +34,10 @@ function ChatMessage({
               ))}
           </div>
         </span>
-        <p className="text-sm w-fit max-w-[300px] text-wrap py-1 mt-1 px-2 chuj-jebać-firefox bg-black rounded-lg text-white">
-          {chatterData.message}
-        </p>
+        <p
+          dangerouslySetInnerHTML={{ __html: chatterData.message }}
+          className="text-sm w-fit max-w-[300px] text-wrap py-1 mt-1 px-2 chuj-jebać-firefox bg-black rounded-lg text-white emote-inside flex flex-row justify-center flex-wrap"
+        />
       </div>
     </span>
   );

@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import ChatMessage from "~/components/ChatMessage";
 import colorParser from "~/utils/colorParser";
 import badgeParser from "~/utils/badgeParser";
+import messageParser, { setSevenTvEmotes } from "~/utils/messageParser";
+import { fetchEmotesByTwitchId, streamerId } from "~/utils/7tvEmoteProvider";
 import tmi from "tmi.js";
 
 function Chat() {
@@ -21,26 +23,50 @@ function Chat() {
       console.log("connecting");
     });
 
-    client.on("connected", () => {
-      console.log("connected");
+    client.on("connected", async () => {
+      console.log(`connected`);
+
+      var [data, error] = await fetchEmotesByTwitchId(streamerId);
+      if (error === null) setSevenTvEmotes(data);
     });
 
     client.on("message", async (channel, tags, message) => {
       var badges = await badgeParser(tags);
 
-      if (cachedAvatars.map((x) => x.id).includes(tags["user-id"])) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            message,
-            tags: {
-              username: tags.username,
-              avatar: cachedAvatars.find((x) => x.id === tags["user-id"]).url,
-              color: colorParser(tags),
-              badges: badges,
+      if (tags.subscriber !== true) {
+        setMessages((prev) => {
+          const newMessages = [
+            ...prev,
+            {
+              message: messageParser(message),
+              tags: {
+                username: tags.username,
+                avatar: "https://i.imgur.com/4X2vyND.png",
+                color: colorParser(tags),
+                badges: badges,
+              },
             },
-          },
-        ]);
+          ];
+          return newMessages.slice(-50);
+        });
+        return;
+      }
+      if (cachedAvatars.map((x) => x.id).includes(tags["user-id"])) {
+        setMessages((prev) => {
+          const newMessages = [
+            ...prev,
+            {
+              message: messageParser(message),
+              tags: {
+                username: tags.username,
+                avatar: cachedAvatars.find((x) => x.id === tags["user-id"]).url,
+                color: colorParser(tags),
+                badges: badges,
+              },
+            },
+          ];
+          return newMessages.slice(-50);
+        });
       } else {
         await fetch(`${import.meta.env.VITE_API}/user/${tags["user-id"]}`, {
           method: "GET",
@@ -51,18 +77,21 @@ function Chat() {
               id: tags["user-id"],
               url: data.avatar,
             });
-            setMessages((prev) => [
-              ...prev,
-              {
-                message,
-                tags: {
-                  username: tags.username,
-                  avatar: data.avatar,
-                  color: colorParser(tags),
-                  badges: badges,
+            setMessages((prev) => {
+              const newMessages = [
+                ...prev,
+                {
+                  message: messageParser(message),
+                  tags: {
+                    username: tags.username,
+                    avatar: data.avatar,
+                    color: colorParser(tags),
+                    badges: badges,
+                  },
                 },
-              },
-            ]);
+              ];
+              return newMessages.slice(-50);
+            });
           });
       }
     });
