@@ -10,6 +10,7 @@ import tmi from "tmi.js";
 function Chat() {
   const { channelName } = useParams();
   const [messages, setMessages] = useState([]);
+  const [blockedUsers, setBlockedUsers] = useState([]);
   const chatRef = useRef(null);
   var cachedAvatars = [];
 
@@ -26,6 +27,9 @@ function Chat() {
     client.on("connected", async () => {
       console.log(`connected`);
 
+      var blockedUsers = JSON.parse(localStorage.getItem("blockedUsers")) || [];
+      setBlockedUsers(blockedUsers);
+
       var [data, error] = await fetchEmotesByTwitchId(streamerId);
       if (error === null) setSevenTvEmotes(data);
     });
@@ -35,6 +39,30 @@ function Chat() {
     });
 
     client.on("message", async (channel, tags, message) => {
+      if (message.startsWith("!block")) {
+        var args = message.split(" ");
+        var username = args[1].toLowerCase();
+        if (username.startsWith("@")) username = username.slice(1);
+        var temp = blockedUsers;
+        temp.push(username);
+        localStorage.setItem("blockedUsers", JSON.stringify(temp));
+        setBlockedUsers(temp);
+        return;
+      }
+
+      if (message.startsWith("!unblock")) {
+        var args = message.split(" ");
+        var username = args[1].toLowerCase();
+        if (username.startsWith("@")) username = username.slice(1);
+        var temp = blockedUsers;
+        temp.splice(temp.indexOf(username), 1);
+        localStorage.setItem("blockedUsers", JSON.stringify(temp));
+        setBlockedUsers(temp);
+        return;
+      }
+
+      if (blockedUsers.includes(tags.username)) return;
+
       var badges = await badgeParser(tags);
 
       if (tags.subscriber !== true) {
