@@ -43,7 +43,7 @@ function Chat() {
     });
 
     client.on("message", async (channel, tags, message) => {
-      if (message.startsWith("!block")) {
+      if (message.startsWith("!hide")) {
         if (!tags.mod) return;
         var args = message.split(" ");
         var username = args[1].toLowerCase();
@@ -68,7 +68,7 @@ function Chat() {
         return;
       }
 
-      if (message.startsWith("!unblock")) {
+      if (message.startsWith("!show")) {
         if (!tags.mod) return;
         var args = message.split(" ");
         var username = args[1].toLowerCase();
@@ -77,6 +77,12 @@ function Chat() {
         temp.splice(temp.indexOf(username), 1);
         localStorage.setItem("blockedUsers", JSON.stringify(temp));
         setBlockedUsers(temp);
+        return;
+      }
+
+      if (message.startsWith("!clearCache")) {
+        if (!tags.mod) return;
+        cachedAvatars = [];
         return;
       }
 
