@@ -44,7 +44,7 @@ function Chat() {
 
     client.on("message", async (channel, tags, message) => {
       if (message.startsWith("!hide")) {
-        if (!tags.mod) return;
+        if (!tags?.mod && tags?.badges?.broadcaster !== "1") return;
         var args = message.split(" ");
         var username = args[1].toLowerCase();
         if (username.startsWith("@")) username = username.slice(1);
@@ -55,21 +55,15 @@ function Chat() {
         return;
       }
 
-      if (message.startsWith("!clear")) {
-        if (!tags.mod) return;
-        setMessages([]);
-        return;
-      }
-
       if (message.startsWith("!emote")) {
-        if (!tags.mod) return;
+        if (!tags?.mod && tags?.badges?.broadcaster !== "1") return;
         var [data, error] = await fetchEmotesByTwitchId(streamerId);
         if (error === null) setSevenTvEmotes(data);
         return;
       }
 
       if (message.startsWith("!show")) {
-        if (!tags.mod) return;
+        if (!tags?.mod && tags?.badges?.broadcaster !== "1") return;
         var args = message.split(" ");
         var username = args[1].toLowerCase();
         if (username.startsWith("@")) username = username.slice(1);
@@ -81,8 +75,14 @@ function Chat() {
       }
 
       if (message.startsWith("!clearCache")) {
-        if (!tags.mod) return;
+        if (!tags?.mod && tags?.badges?.broadcaster !== "1") return;
         cachedAvatars = [];
+        return;
+      }
+
+      if (message.startsWith("!clear")) {
+        if (!tags?.mod && tags?.badges?.broadcaster !== "1") return;
+        setMessages([]);
         return;
       }
 
