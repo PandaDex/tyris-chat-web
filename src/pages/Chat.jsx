@@ -84,40 +84,28 @@ function Chat() {
 
       var badges = await badgeParser(tags);
 
-      if (tags.subscriber !== true) {
-        setMessages((prev) => {
-          const newMessages = [
-            ...prev,
-            {
-              message: messageParser(message, tags),
-              tags: {
-                username: tags.username,
-                avatar: "https://i.imgur.com/4X2vyND.png",
-                color: colorParser(tags),
-                badges: badges,
-              },
-            },
-          ];
-          return newMessages.slice(-15);
-        });
+      if (
+        tags?.subscriber !== true &&
+        tags?.mod !== true &&
+        tags?.vip !== true &&
+        tags?.badges?.broadcaster !== "1"
+      ) {
+        displayMessage(
+          message,
+          tags,
+          badges,
+          "https://i.imgur.com/4X2vyND.png"
+        );
         return;
       }
       if (cachedAvatars.map((x) => x.id).includes(tags["user-id"])) {
-        setMessages((prev) => {
-          const newMessages = [
-            ...prev,
-            {
-              message: messageParser(message, tags),
-              tags: {
-                username: tags.username,
-                avatar: cachedAvatars.find((x) => x.id === tags["user-id"]).url,
-                color: colorParser(tags),
-                badges: badges,
-              },
-            },
-          ];
-          return newMessages.slice(-15);
-        });
+        displayMessage(
+          message,
+          tags,
+          badges,
+          cachedAvatars.find((x) => x.id === tags["user-id"]).url
+        );
+        return;
       } else {
         await fetch(`${import.meta.env.VITE_API}/user/${tags["user-id"]}`, {
           method: "GET",
@@ -128,22 +116,9 @@ function Chat() {
               id: tags["user-id"],
               url: data.avatar,
             });
-            setMessages((prev) => {
-              const newMessages = [
-                ...prev,
-                {
-                  message: messageParser(message, tags),
-                  tags: {
-                    username: tags.username,
-                    avatar: data.avatar,
-                    color: colorParser(tags),
-                    badges: badges,
-                  },
-                },
-              ];
-              return newMessages.slice(-15);
-            });
+            displayMessage(message, tags, badges, data.avatar);
           });
+        return;
       }
     });
     client.connect();
@@ -154,6 +129,25 @@ function Chat() {
       }
     }, 300);
   }, [channelName]);
+
+  const displayMessage = (message, tags, badges, data) => {
+    setMessages((prev) => {
+      const newMessages = [
+        ...prev,
+        {
+          message: messageParser(message, tags),
+          tags: {
+            username: tags["display-name"],
+            avatar: data,
+            color: colorParser(tags),
+            badges: badges,
+          },
+        },
+      ];
+      return newMessages.slice(-15);
+    });
+  };
+
   return (
     <div
       ref={chatRef}
